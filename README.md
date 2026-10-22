@@ -60,7 +60,7 @@ docker run --rm -p 127.0.0.1:9000:9000 framed-tcp-lab
 python -m netframe.client PING
 ```
 
-The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite and builds the image on pushes and pull requests. [The first CI run](https://github.com/AadeshMishra333/framed-tcp-lab/actions/runs/39790646682) passed all 11 tests and built the image. This local workstation does not have Docker, and the container has not been run locally, so the documented `docker run` demo remains for Aadesh to verify on a Docker host.
+The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite, builds the image, starts a container, and sends a `PING` smoke request on pushes and pull requests. [CI run #4](https://github.com/AadeshMishra333/framed-tcp-lab/actions/runs/39791346071) passed those checks. This local workstation does not have Docker; the documented `docker run` demo remains for Aadesh to verify on his own machine if available.
 
 ## Tests and failure behavior
 
