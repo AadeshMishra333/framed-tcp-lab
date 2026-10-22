@@ -1,5 +1,7 @@
 # Framed TCP Lab
 
+![Checks](https://github.com/AadeshMishra333/framed-tcp-lab/actions/workflows/ci.yml/badge.svg)
+
 A small, runnable TCP service that makes a common network programming problem visible: one application message may arrive in several socket reads, while several messages may arrive in one read. The server accepts a bounded binary frame, runs a simple command, and replies in the same format. It uses only Python's standard library.
 
 This is an educational network service with a reproducible container build and automated checks. It is not a Marvell product, a secure public API, or a cryptographic protocol.
@@ -58,7 +60,7 @@ docker run --rm -p 127.0.0.1:9000:9000 framed-tcp-lab
 python -m netframe.client PING
 ```
 
-The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite and builds the image on pushes and pull requests. This local workstation does not currently have Docker, so its image build must be confirmed by CI or another Docker host before claiming the container ran successfully.
+The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite and builds the image on pushes and pull requests. [The first CI run](https://github.com/AadeshMishra333/framed-tcp-lab/actions/runs/39790646682) passed all 11 tests and built the image. This local workstation does not have Docker, and the container has not been run locally, so the documented `docker run` demo remains for Aadesh to verify on a Docker host.
 
 ## Tests and failure behavior
 
@@ -89,4 +91,4 @@ The server applies a three-second socket timeout, closes malformed connections, 
 
 ### Provenance and next extension
 
-The initial scaffold was AI-assisted on 22 October 2026. Local parser and socket tests were run by the assistant; this does not establish Aadesh's independent implementation or explanation. A useful next extension, after the above defense, is a C++ implementation of the *same documented protocol* with the Python client as a compatibility check. Add TLS only through a maintained library and test certificate failures; do not write cryptography from scratch.
+The initial scaffold was AI-assisted on 22 October 2026. Local parser and socket tests were run by the assistant and repeated successfully in GitHub CI; this does not establish Aadesh's independent implementation or explanation. A useful next extension, after the above defense, is a C++ implementation of the *same documented protocol* with the Python client as a compatibility check. Add TLS only through a maintained library and test certificate failures; do not write cryptography from scratch.
