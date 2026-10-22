@@ -16,3 +16,15 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Build container image
         run: docker build -t framed-tcp-lab:ci .
+      - name: Run container smoke check
+        run: |
+          docker run --rm -d --name framed-tcp-lab-smoke -p 127.0.0.1:19000:9000 framed-tcp-lab:ci
+          trap 'docker stop framed-tcp-lab-smoke' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if [ "$(python -m netframe.client PING --port 19000 2>/dev/null)" = "PONG" ]; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs framed-tcp-lab-smoke
+          exit 1
