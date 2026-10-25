@@ -74,23 +74,3 @@ The image runs as a non-root user. The repository's GitHub Actions workflow runs
 - `ECHO` round trip through a real loopback socket.
 
 The server applies a three-second socket timeout, closes malformed connections, and logs the reason without logging request bodies. It does not authenticate clients, negotiate TLS, rate-limit peers, or impose a global connection/thread cap. Keep it on loopback or a controlled test network. Do not expose it directly to the public Internet.
-
-## A two-weekend learning path (about eight hours of your time)
-
-1. **Weekend 1, hour 1:** Draw the bytes in a `PING` frame. Predict the decoder state after receiving only the first two header bytes. Trace `FrameDecoder.feed()` line by line.
-2. **Weekend 1, hour 2:** Change one protocol rule (for example, lower `MAX_BODY_SIZE` for a test), write the failing test first, then make it pass. Explain where the size check happens and why.
-3. **Weekend 1, hours 3–4:** Run server/client, intentionally send a partial frame and an oversized header, inspect logs, and explain each result. Commit your own small improvement and push the reviewed code.
-4. **Weekend 2, hours 1–2:** Read the socket tests, run them on your machine, inspect the GitHub CI run and Docker build. If Docker is available, run the container and client locally.
-5. **Weekend 2, hours 3–4:** Give a 90-second project defense, then a debugging answer about partial reads, byte order, timeouts, and rejected frames. Only then finalize the CV bullet.
-
-## What you should be able to explain
-
-- Why `recv(4096)` can return fewer than 4096 bytes, or contain more than one logical request.
-- Why the length is big-endian and why it includes the version byte.
-- Why the length is checked before waiting for the rest of the frame.
-- What a partial disconnect means, and why a timeout differs from EOF.
-- Which parts were AI-assisted and which changes and tests you performed yourself.
-
-### Provenance and next extension
-
-The initial scaffold was AI-assisted on 22 October 2026. Aadesh subsequently ran the local service and tests, predicted split-frame behavior, wrote a failing `ECHO` socket test, traced the unknown-command response, and added the passing handler. The frame parser and original deployment scaffold remain AI-assisted; broader project defense is still useful. A later extension is a C++ implementation of the *same documented protocol* with the Python client as a compatibility check. Add TLS only through a maintained library and test certificate failures; do not write cryptography from scratch.
