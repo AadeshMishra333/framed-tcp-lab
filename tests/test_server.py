@@ -15,6 +15,12 @@ class ServerIntegrationTests(unittest.TestCase):
         cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
         cls.thread.start()
 
+    def test_echo_round_trip(self):
+        self.assertEqual(
+            request("127.0.0.1", self.port, b"ECHO hello"),
+            b"hello",
+        )
+
     @classmethod
     def tearDownClass(cls):
         cls.server.shutdown()

@@ -17,9 +17,10 @@ python -m netframe.server --host 127.0.0.1 --port 9000
 ```text
 python -m netframe.client PING
 python -m netframe.client "UPPER hello network"
+python -m netframe.client "ECHO hello network"
 ```
 
-Expected replies are `PONG` and `HELLO NETWORK`. Port `9000` is configurable. The default address is loopback, so the service is not exposed to the local network.
+Expected replies are `PONG`, `HELLO NETWORK`, and `hello network`. Port `9000` is configurable. The default address is loopback, so the service is not exposed to the local network.
 
 Run all checks, including real loopback socket interactions:
 
@@ -35,7 +36,7 @@ python -m unittest discover -s tests -v
 | 4 | Version (`1`) |
 | 5 onward | ASCII command payload |
 
-The body length must be from 1 through 65,536 bytes. `PING` returns `PONG`; `UPPER text` returns uppercase ASCII text; unknown commands return `ERR unknown-command`. A malformed length or unsupported version causes the server to close the connection. This explicit close is the lab's protocol-error policy, not a general network standard.
+The body length must be from 1 through 65,536 bytes. `PING` returns `PONG`; `UPPER text` returns uppercase ASCII text; `ECHO text` returns the text unchanged; unknown commands return `ERR unknown-command`. A malformed length or unsupported version causes the server to close the connection. This explicit close is the lab's protocol-error policy, not a general network standard.
 
 ### Why the decoder keeps state
 
@@ -60,7 +61,7 @@ docker run --rm -p 127.0.0.1:9000:9000 framed-tcp-lab
 python -m netframe.client PING
 ```
 
-The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite, builds the image, starts a container, and sends a `PING` smoke request on pushes and pull requests. [CI run #4](https://github.com/AadeshMishra333/framed-tcp-lab/actions/runs/39791346071) passed those checks. This local workstation does not have Docker; the documented `docker run` demo remains for Aadesh to verify on his own machine if available.
+The image runs as a non-root user. The repository's GitHub Actions workflow runs the unit/integration suite, builds the image, starts a container, and sends a `PING` smoke request on pushes and pull requests. Check the [workflow runs](https://github.com/AadeshMishra333/framed-tcp-lab/actions/workflows/ci.yml) for the latest result. This local workstation does not have Docker; the documented `docker run` demo remains for Aadesh to verify on his own machine if available.
 
 ## Tests and failure behavior
 
@@ -70,6 +71,7 @@ The image runs as a non-root user. The repository's GitHub Actions workflow runs
 - Unknown protocol version.
 - Client disconnect halfway through a frame; server remains available.
 - Unknown command returns an explicit error.
+- `ECHO` round trip through a real loopback socket.
 
 The server applies a three-second socket timeout, closes malformed connections, and logs the reason without logging request bodies. It does not authenticate clients, negotiate TLS, rate-limit peers, or impose a global connection/thread cap. Keep it on loopback or a controlled test network. Do not expose it directly to the public Internet.
 
@@ -91,4 +93,4 @@ The server applies a three-second socket timeout, closes malformed connections, 
 
 ### Provenance and next extension
 
-The initial scaffold was AI-assisted on 22 October 2026. Local parser and socket tests were run by the assistant and repeated successfully in GitHub CI; this does not establish Aadesh's independent implementation or explanation. A useful next extension, after the above defense, is a C++ implementation of the *same documented protocol* with the Python client as a compatibility check. Add TLS only through a maintained library and test certificate failures; do not write cryptography from scratch.
+The initial scaffold was AI-assisted on 22 October 2026. Aadesh subsequently ran the local service and tests, predicted split-frame behavior, wrote a failing `ECHO` socket test, traced the unknown-command response, and added the passing handler. The frame parser and original deployment scaffold remain AI-assisted; broader project defense is still useful. A later extension is a C++ implementation of the *same documented protocol* with the Python client as a compatibility check. Add TLS only through a maintained library and test certificate failures; do not write cryptography from scratch.

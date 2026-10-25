@@ -23,6 +23,8 @@ def respond(payload: bytes) -> bytes:
             return payload[6:].decode("ascii").upper().encode("ascii")
         except UnicodeDecodeError:
             return b"ERR ascii-only"
+    if payload.startswith(b"ECHO "):
+        return payload[len(b"ECHO "):]
     return b"ERR unknown-command"
 
 
